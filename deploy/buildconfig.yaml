@@ -1,0 +1,23 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  labels:
+    build: minecraft-scan
+  name: minecraft-scan
+  namespace: minecraft-scan
+spec:
+  successfulBuildsHistoryLimit: 3
+  failedBuildsHistoryLimit: 3
+  source:
+    git:
+      uri: "git@git.csh.rit.edu:mom/minecraft-scan.git"
+    sourceSecret:
+      name: "git-deploy-key"
+  output:
+    to:
+      kind: ImageStreamTag
+      name: minecraft-scan:latest
+  runPolicy: Serial
+  strategy:
+    dockerStrategy: {}
+    type: Docker

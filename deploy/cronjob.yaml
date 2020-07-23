@@ -1,0 +1,18 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: "minecraft-scan"
+  namespace: "minecraft-scan"
+spec:
+  schedule: "51 06 * * *"
+  jobTemplate:
+    spec:
+      template:
+        metadata:
+          labels:
+            parent: "cronjob-minecraft-scan"
+        spec:
+          containers:
+            - name: "minecraft-scan"
+              image: "minecraft-scan"
+          restartPolicy: "OnFailure"

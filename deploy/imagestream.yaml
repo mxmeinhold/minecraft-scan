@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ImageStream
+metadata:
+  labels:
+    app: minecraft-scan
+  name: minecraft-scan
+  namespace: minecraft-scan
+spec: {}
+status:
+  tags:
+  - items:
+    tag: latest
