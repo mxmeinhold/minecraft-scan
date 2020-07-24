@@ -5,7 +5,10 @@ metadata:
     app: minecraft-scan
   name: minecraft-scan
   namespace: minecraft-scan
-spec: {}
+spec:
+  lookupPolicy:
+    # Look for a local image name
+    local: true
 status:
   tags:
   - items:
