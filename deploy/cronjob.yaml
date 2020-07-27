@@ -15,4 +15,7 @@ spec:
           containers:
             - name: "minecraft-scan"
               image: "minecraft-scan"
+              env:
+                - name: SCAN_SUBNET
+                  value: "127.0.0.1/32"
           restartPolicy: "OnFailure"

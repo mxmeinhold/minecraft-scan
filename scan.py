@@ -8,9 +8,14 @@ subnet = environ.get('SCAN_SUBNET', '127.0.0.1')
 
 def status_to_dict(status):
     return {
-        'players': status.online,
-        'maximum_players': status.max,
-        'sample (whatever that is)': status.sample,
+        'raw': status.raw,
+        'players': status.players.online,
+        'maximum_players': status.players.max,
+        'version': {
+            'name': status.version.name,
+            'protocol': status.version.protocol,
+        },
+        'description': status.description,
         'latency': status.latency,
     }
 
