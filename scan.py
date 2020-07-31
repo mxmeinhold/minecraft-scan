@@ -4,7 +4,7 @@ from os import environ
 
 from mcstatus import MinecraftServer
 
-subnet = environ.get('SCAN_SUBNET', '127.0.0.1')
+subnets = environ.get('SCAN_SUBNET', '127.0.0.1').split(',')
 
 def status_to_dict(status):
     return {
@@ -36,26 +36,26 @@ def query_to_dict(query):
             },
     }
 
-
-scan_hosts = ip_network(subnet).hosts()
-
 servers = {}
-for address in map(str, scan_hosts):
-    server = MinecraftServer.lookup(address)
-    try:
-        server.ping()
-        servers[address] = {}
+for subnet in subnets:
+    scan_hosts = ip_network(subnet).hosts()
+
+    for address in map(str, scan_hosts):
+        server = MinecraftServer.lookup(address)
         try:
-            servers[address]['status'] = status_to_dict(server.status())
+            server.ping()
+            servers[address] = {}
+            try:
+                servers[address]['status'] = status_to_dict(server.status())
+            except Exception as e:
+                print(e) # TODO logger?
+            try:
+                servers[address]['query'] = query_to_dict(server.query())
+            except Exception as e:
+                print(e) # TODO logger?
+            if servers[address] == {}:
+                del servers[address]
         except Exception:
-            pass
-        try:
-            servers[address]['query'] = query_to_dict(server.query())
-        except Exception:
-            pass
-        if servers[address] == {}:
-            del servers[address]
-    except Exception:
-        continue
+            continue
 
 print(servers)
