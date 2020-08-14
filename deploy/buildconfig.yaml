@@ -10,9 +10,7 @@ spec:
   failedBuildsHistoryLimit: 3
   source:
     git:
-      uri: "git@git.csh.rit.edu:mom/minecraft-scan.git"
-    sourceSecret:
-      name: "git-deploy-key"
+      uri: "https://github.com/mxmeinhold/minecraft-scan.git"
   output:
     to:
       kind: ImageStreamTag
