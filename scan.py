@@ -2,6 +2,8 @@
 import json
 from ipaddress import ip_network
 from os import environ
+import asyncio
+import itertools
 
 from mcstatus import MinecraftServer
 
@@ -37,29 +39,47 @@ def query_to_dict(query):
             },
     }
 
-servers = []
-for subnet in subnets:
-    scan_hosts = ip_network(subnet).hosts()
-
-    for address in map(str, scan_hosts):
-        server = MinecraftServer.lookup(address)
+def get_info(address):
+    server = MinecraftServer.lookup(address)
+    try:
+        server.ping()
+        out = {}
         try:
-            server.ping()
-            out = {}
-            try:
-               out['status'] = status_to_dict(server.status())
-            except Exception as e:
-                pass
-                #print(e) # TODO logger?
-            try:
-                out['query'] = query_to_dict(server.query())
-            except Exception as e:
-                pass
-                #print(e) # TODO logger?
-            if out != {}:
-                out['address'] = address
-                out['subnet'] = subnet
-                print(json.dumps(out))
-                servers.append(out)
+            out['query'] = query_to_dict(server.query(tries=1))
+
         except Exception:
-            continue
+            pass
+            #print(e) # TODO logger?
+        try:
+            out['status'] = status_to_dict(server.status(tries=1))
+        except Exception:
+            pass
+            #print(e) # TODO logger?
+        print(json.dumps(out))
+        if out != {}:
+            out['host'] = {
+                'address': address,
+            }
+            try:
+                out['host']['name'], out['host']['alts'], _ = socket.gethostbyaddr(address)
+            except Exception:
+                pass
+            print(json.dumps(out))
+            return out
+        return None
+    except Exception:
+        return None
+
+async def main():
+    nets = map(ip_network, subnets)
+
+    # get all the ip addresses (using itertools.chain to flatten the ip.hosts() lists)
+    hosts = map(str, itertools.chain(*map(lambda ip: ip.hosts(), nets)))
+
+    #create tasks
+    tasks = map(asyncio.create_task, map(lambda host: asyncio.to_thread(get_info, host), hosts))
+
+    # and wait for completion
+    done, pending = await asyncio.wait(tasks)
+
+asyncio.run(main())
