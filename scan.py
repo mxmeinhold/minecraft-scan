@@ -55,7 +55,6 @@ def get_info(address):
         except Exception:
             pass
             #print(e) # TODO logger?
-        print(json.dumps(out))
         if out != {}:
             out['host'] = {
                 'address': address,
