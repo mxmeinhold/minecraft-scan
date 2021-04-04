@@ -1,4 +1,5 @@
 #pylint: disable=broad-except
+import json
 from ipaddress import ip_network
 from os import environ
 
@@ -58,4 +59,4 @@ for subnet in subnets:
         except Exception:
             continue
 
-print(servers)
+print(json.dumps(servers))
