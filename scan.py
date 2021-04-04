@@ -37,7 +37,7 @@ def query_to_dict(query):
             },
     }
 
-servers = {}
+servers = []
 for subnet in subnets:
     scan_hosts = ip_network(subnet).hosts()
 
@@ -45,18 +45,21 @@ for subnet in subnets:
         server = MinecraftServer.lookup(address)
         try:
             server.ping()
-            servers[address] = {}
+            out = {}
             try:
-                servers[address]['status'] = status_to_dict(server.status())
+               out['status'] = status_to_dict(server.status())
             except Exception as e:
-                print(e) # TODO logger?
+                pass
+                #print(e) # TODO logger?
             try:
-                servers[address]['query'] = query_to_dict(server.query())
+                out['query'] = query_to_dict(server.query())
             except Exception as e:
-                print(e) # TODO logger?
-            if servers[address] == {}:
-                del servers[address]
+                pass
+                #print(e) # TODO logger?
+            if out != {}:
+                out['address'] = address
+                out['subnet'] = subnet
+                print(json.dumps(out))
+                servers.append(out)
         except Exception:
             continue
-
-print(json.dumps(servers))
